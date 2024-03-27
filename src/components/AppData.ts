@@ -27,4 +27,5 @@ class CardItem extends Model<IProduct> {
   title: string;
   category: string;
   price: number | null;
+  isBasket: boolean = false;
 }

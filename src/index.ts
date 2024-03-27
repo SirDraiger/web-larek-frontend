@@ -6,6 +6,7 @@ import { EventEmitter } from './components/base/events';
 import { Page } from './components/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Card } from './components/Card';
+import { Modal } from './components/common/Modal';
 
 const events = new EventEmitter();
 const api = new WebLarekAPI(CDN_URL, API_URL);
@@ -23,7 +24,8 @@ const cardCatalogTemplate = ensureElement<HTMLTemplateElement>("#card-catalog");
 const AppData = new AppState({}, events);
 
 // Глобальные контейнеры
-const page = new Page( document.body, events);
+const page = new Page(document.body, events);
+const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
 
 // Изменились элементы каталога
@@ -46,8 +48,21 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 events.on('card:select', (item) => {
 	console.log(item);
 	console.log(`тыкнули на карточку`);
+	modal.open();
 })
 
+
+
+
+// Блокируем прокрутку страницы если открыто модальное окно
+events.on('modal:open', () => {
+	page.locked = true;
+});
+
+// Разблокируем прокрутку страницы при закрытии модального окна
+events.on('model:close', () => {
+	page.locked = false;
+})
 
 // Получаем список продуктов
 api.getCardList()
