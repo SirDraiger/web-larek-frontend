@@ -7,6 +7,7 @@ import { Page } from './components/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Card } from './components/Card';
 import { Modal } from './components/common/Modal';
+import { IProduct } from './types';
 
 const events = new EventEmitter();
 const api = new WebLarekAPI(CDN_URL, API_URL);
@@ -18,6 +19,7 @@ events.onAll(({ eventName, data }) => {
 
 // Все шаблоны
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>("#card-catalog");
+const cardPreviewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
 // 
 
 // Модель данных приложения
@@ -45,10 +47,22 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 })
 
 // Нажали на карточку
-events.on('card:select', (item) => {
+events.on('card:select', (item: IProduct) => {
 	console.log(item);
 	console.log(`тыкнули на карточку`);
-	modal.open();
+
+	const card = new Card(cloneTemplate(cardPreviewTemplate), {
+		onClick: () => 
+				events.emit('card:open', item)
+	});
+	return modal.render({
+		content: card.render({
+			category: item.category,
+			title: item.title,
+			image: item.image,
+			price: item.price,
+		})
+	});
 })
 
 
@@ -60,7 +74,7 @@ events.on('modal:open', () => {
 });
 
 // Разблокируем прокрутку страницы при закрытии модального окна
-events.on('model:close', () => {
+events.on('modal:close', () => {
 	page.locked = false;
 })
 
