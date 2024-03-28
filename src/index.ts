@@ -46,14 +46,22 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 	})	
 })
 
+// Изменились элементы корзины
+events.on('basket:changed', () => {
+	console.log(AppData.basket.length);
+	page.counter = AppData.basket.length;
+})
+
 // Нажали на карточку
 events.on('card:select', (item: IProduct) => {
-	console.log(item);
-	console.log(`тыкнули на карточку`);
 
 	const card = new Card(cloneTemplate(cardPreviewTemplate), {
-		onClick: () => 
-				events.emit('card:open', item)
+		onClick: () => 	{
+
+			events.emit('card:open', item)
+
+
+		}
 	});
 	return modal.render({
 		content: card.render({
@@ -61,12 +69,10 @@ events.on('card:select', (item: IProduct) => {
 			title: item.title,
 			image: item.image,
 			price: item.price,
+			description: item.description
 		})
 	});
 })
-
-
-
 
 // Блокируем прокрутку страницы если открыто модальное окно
 events.on('modal:open', () => {
@@ -79,12 +85,13 @@ events.on('modal:close', () => {
 })
 
 // Получаем список продуктов
-api.getCardList()
+api
+	.getCardList()
 	.then(AppData.setCatalog.bind(AppData))
-	.catch(err => {
-		console.error(err)
+	.catch((err) => {
+		console.error(err);
 	});
 
-console.log(api);
-console.log(AppData);
-console.log(events);
+events.on ('basket:open', () => {
+	alert('Тыкнуто на корзину');
+});

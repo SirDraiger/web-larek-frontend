@@ -11,4 +11,5 @@ export interface IProduct {
 // Интерфейс модели данных приложения
 export interface IAppState {
   catalog: IProduct[];
+  basket: IProduct[];
 }

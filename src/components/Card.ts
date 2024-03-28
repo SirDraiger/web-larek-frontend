@@ -9,24 +9,34 @@ interface ICard {
   title: string;
   image: string;
   price: number | null;
+  description: string;
 }
 
 export class Card extends Component<ICard> {
-  // protected _button: HTMLButtonElement;
   protected _category: HTMLElement;
   protected _title: HTMLElement;
   protected _image: HTMLImageElement;
   protected _price: HTMLElement;
+  protected _description: HTMLElement;
+  protected _button: HTMLButtonElement;
 
   constructor(container: HTMLElement, actions: ICardActions) {
     super(container);
 
-    // this._button = container.querySelector('.card');
     this._category = container.querySelector('.card__category');
     this._title = container.querySelector('.card__title');
     this._image = container.querySelector('.card__image');
     this._price = container.querySelector('.card__price');
-    container.addEventListener("click", actions.onClick);
+    this._description = container.querySelector('.card__text');
+    this._button = container.querySelector('.card__button');
+
+    if(this._button) {
+      this._button.addEventListener("click", () => {
+        alert('Тыкнули на кнопку');
+      });
+    } else {
+      container.addEventListener("click", actions.onClick);
+    }
   }
 
   set category(value:string) {
