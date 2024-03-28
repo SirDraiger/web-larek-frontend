@@ -48,7 +48,6 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 
 // Изменились элементы корзины
 events.on('basket:changed', () => {
-	console.log(AppData.basket.length);
 	page.counter = AppData.basket.length;
 })
 
@@ -57,10 +56,7 @@ events.on('card:select', (item: IProduct) => {
 
 	const card = new Card(cloneTemplate(cardPreviewTemplate), {
 		onClick: () => 	{
-
 			events.emit('card:open', item)
-
-
 		}
 	});
 	return modal.render({
