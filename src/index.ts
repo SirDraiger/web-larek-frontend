@@ -8,6 +8,7 @@ import { cloneTemplate, ensureElement } from './utils/utils';
 import { Card } from './components/Card';
 import { Modal } from './components/common/Modal';
 import { IProduct } from './types';
+import { Basket } from './components/common/Basket';
 
 const events = new EventEmitter();
 const api = new WebLarekAPI(CDN_URL, API_URL);
@@ -20,6 +21,7 @@ events.onAll(({ eventName, data }) => {
 // Все шаблоны
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>("#card-catalog");
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
+const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
 // 
 
 // Модель данных приложения
@@ -29,6 +31,8 @@ const AppData = new AppState({}, events);
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
+// Переиспользуемые части интерфейса
+const basket = new Basket(cloneTemplate(basketTemplate), events);
 
 // Изменились элементы каталога
 events.on<CatalogChangeEvent>('items:changed', () => {
@@ -91,6 +95,12 @@ api
 		console.error(err);
 	});
 
+
+
+
+// Открытие корзины
 events.on ('basket:open', () => {
-	alert('Тыкнуто на корзину');
+	return modal.render({
+		content: basket.render()
+	})
 });
