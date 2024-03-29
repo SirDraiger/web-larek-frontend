@@ -22,6 +22,7 @@ events.onAll(({ eventName, data }) => {
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>("#card-catalog");
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
 const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
+const cardBasketTemplate = ensureElement<HTMLTemplateElement>("#card-basket");
 // 
 
 // Модель данных приложения
@@ -99,8 +100,52 @@ api
 
 
 // Открытие корзины
-events.on ('basket:open', () => {
+events.on('basket:open', () => {
+
+	basket.items = AppData.basket.map((item, index) => {
+
+		const card = new Card(cloneTemplate(cardBasketTemplate), {
+			onClick: () => {
+				AppData.removeFromBasket(item);
+				events.emit('basket:remove');
+			}
+		});
+			return card.render({
+				title: item.title,
+				price: item.price,
+				index: index + 1
+			});
+	})
+
+
 	return modal.render({
 		content: basket.render()
+	});
+});
+
+// Удаление товара из корзины
+events.on('basket:remove', () => {
+
+	basket.items = AppData.basket.map((item, index) => {
+
+		const card = new Card(cloneTemplate(cardBasketTemplate), {
+			onClick: () => {
+				console.log(AppData.basket);
+				AppData.removeFromBasket(item);
+				console.log(AppData.basket);
+				console.log(AppData.catalog);
+				events.emit('basket:remove');
+			}
+		});
+			return card.render({
+				title: item.title,
+				price: item.price,
+				index: index + 1
+			});
 	})
+
+
+	return modal.render({
+		content: basket.render()
+	});
 });

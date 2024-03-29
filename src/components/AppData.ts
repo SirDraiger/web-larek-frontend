@@ -19,6 +19,16 @@ export class AppState extends Model<IAppState> {
       }
     }
 
+
+    // Переделать это безобразие
+    removeFromBasket(item: IProduct) {
+      item.inBasket = false;
+      const index = this.basket.indexOf(item);
+      this.basket.splice(index, 1);
+      this.emitChanges("basket:changed");
+      this.emitChanges("basket:remove");
+      }
+
     inBasket(id: string) {
       return !!this.basket.find(item => item.id === id);
     }
