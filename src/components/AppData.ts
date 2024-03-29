@@ -14,6 +14,7 @@ export class AppState extends Model<IAppState> {
   addToBasket(item: IProduct) {
     if(!this.inBasket(item.id) && typeof(item.price) === 'number' && item.price > 0) {
         this.basket.push(item);
+        item.inBasket = true;
         this.emitChanges("basket:changed");
       }
     }
@@ -21,6 +22,15 @@ export class AppState extends Model<IAppState> {
     inBasket(id: string) {
       return !!this.basket.find(item => item.id === id);
     }
+
+    getSum() {
+      let sum: number = 0;
+      this.basket.forEach(item => {
+        sum = sum + item.price
+      })
+      return sum;
+    }
+
   }
 
 export type CatalogChangeEvent = {
@@ -35,4 +45,5 @@ class CardItem extends Model<IProduct> {
   title: string;
   category: string;
   price: number | null;
+  inBasket: boolean = false;
 }

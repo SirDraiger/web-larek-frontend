@@ -5,7 +5,8 @@ export interface IProduct {
   image: string;
   title: string;
   category: string;
-  price: number | null;
+  price: number | null;  
+  inBasket?: boolean; //Вынести свойство в отдельный интерфейс
 }
 
 // Интерфейс модели данных приложения

@@ -10,6 +10,7 @@ interface ICard {
 	image: string;
 	price: number | null;
 	description: string;
+	inBasket: boolean;
 }
 
 export class Card extends Component<ICard> {
@@ -73,8 +74,20 @@ export class Card extends Component<ICard> {
 	set price(value: number) {
 		if (value === null) {
 			this.setText(this._price, 'Бесценно');
+			this.setDisabled(this._button, true);
+			this.setText(this._button, 'Бесценно');
 		} else {
 			this.setText(this._price, `${value} синапсов`);
+		}
+	}
+
+	set inBasket(status: boolean) {
+		if (status) {
+			this.setDisabled(this._button, true);
+			this.setText(this._button, 'Товар в корзине');
+		} else {
+			this.setDisabled(this._button, false);
+			this.setText(this._button, 'В корзину');
 		}
 	}
 }

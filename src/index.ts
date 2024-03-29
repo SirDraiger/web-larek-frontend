@@ -56,7 +56,9 @@ events.on('card:select', (item: IProduct) => {
 
 	const card = new Card(cloneTemplate(cardPreviewTemplate), {
 		onClick: () => 	{
-			events.emit('card:open', item)
+			events.emit('card:open', item);
+			AppData.addToBasket(item);
+			card.inBasket = item.inBasket;
 		}
 	});
 	return modal.render({
@@ -64,8 +66,9 @@ events.on('card:select', (item: IProduct) => {
 			category: item.category,
 			title: item.title,
 			image: item.image,
-			price: item.price,
-			description: item.description
+			description: item.description,
+			inBasket: item.inBasket,
+			price: item.price
 		})
 	});
 })
