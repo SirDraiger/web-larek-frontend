@@ -26,14 +26,14 @@ export class AppState extends Model<IAppState> {
       const index = this.basket.indexOf(item);
       this.basket.splice(index, 1);
       this.emitChanges("basket:changed");
-      this.emitChanges("basket:remove");
+      // this.emitChanges("basket:remove");
       }
 
     inBasket(id: string) {
       return !!this.basket.find(item => item.id === id);
     }
 
-    getSum() {
+    getTotal() {
       let sum: number = 0;
       this.basket.forEach(item => {
         sum = sum + item.price

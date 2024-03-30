@@ -119,7 +119,9 @@ events.on('basket:open', () => {
 
 
 	return modal.render({
-		content: basket.render()
+		content: basket.render({
+			total: AppData.getTotal()
+		})
 	});
 });
 
@@ -146,6 +148,8 @@ events.on('basket:remove', () => {
 
 
 	return modal.render({
-		content: basket.render()
+		content: basket.render({
+			total: AppData.getTotal()
+		})
 	});
 });
