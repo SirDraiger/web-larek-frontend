@@ -21,6 +21,11 @@ export class Basket extends Component<IBasketView> {
     this._button = container.querySelector('.basket__button');
 
     this.items = [];
+
+    this._button.addEventListener('click', () => {
+      events.emit("order: open");
+      alert("Открыли модалку с выбором оплаты");
+    })
   }
 
   set items(items: HTMLElement[]) {

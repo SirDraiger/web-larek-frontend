@@ -71,6 +71,8 @@ events.on('card:select', (item: IProduct) => {
 				card.inBasket = item.inBasket;
 			}
 
+			modal.close();
+
 		}
 	});
 	return modal.render({
