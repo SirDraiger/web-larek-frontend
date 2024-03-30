@@ -87,8 +87,7 @@ export class Card extends Component<ICard> {
 
 	set inBasket(status: boolean) {
 		if (status) {
-			this.setDisabled(this._button, true);
-			this.setText(this._button, 'Товар в корзине');
+			this.setText(this._button, 'Удалить');
 		} else {
 			this.setDisabled(this._button, false);
 			this.setText(this._button, 'В корзину');

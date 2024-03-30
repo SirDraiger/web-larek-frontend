@@ -61,9 +61,16 @@ events.on('card:select', (item: IProduct) => {
 
 	const card = new Card(cloneTemplate(cardPreviewTemplate), {
 		onClick: () => 	{
-			events.emit('card:open', item);
-			AppData.addToBasket(item);
-			card.inBasket = item.inBasket;
+			
+			events.emit('card:open', item)
+			if(AppData.inBasket(item.id)) {
+				AppData.removeFromBasket(item);
+				card.inBasket = item.inBasket;
+			} else {
+				AppData.addToBasket(item);
+				card.inBasket = item.inBasket;
+			}
+
 		}
 	});
 	return modal.render({
