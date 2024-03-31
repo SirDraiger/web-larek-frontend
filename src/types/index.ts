@@ -28,11 +28,14 @@ export interface IContactForm {
 }
 
 // Интерфейс товара в заказе 
-interface IItemOrder {
-  item: string[];
+export interface IItemOrder {
+  items: string[];
 }
 
 // Интерфейс заказа
-interface IOrder extends IOrderForm, IContactForm, IItemOrder {
+export interface IOrder extends IOrderForm, IContactForm, IItemOrder {
   total: number;
 }
+
+// Общий тип для валидации форм заказа
+export type IFormErrors = Partial<Record<keyof IOrder, string>>;

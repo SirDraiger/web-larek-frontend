@@ -1,29 +1,40 @@
 import { IContactForm, IOrderForm } from "../types";
-import { ensureAllElements, ensureElement } from "../utils/utils";
+import { paymentType } from "../utils/constants";
+import { ensureAllElements } from "../utils/utils";
 import { IEvents } from "./base/events";
 import { Form } from "./common/Form";
+
+
+export interface IOrderActions {
+	onClick: (event: MouseEvent) => void;
+}
 
 export class Order extends Form<IOrderForm> {
   protected _buttons: HTMLButtonElement[];
 
-  constructor(container: HTMLFormElement, events: IEvents) {
+  constructor(container: HTMLFormElement, events: IEvents, actions: IOrderActions) {
     super(container, events);
 
     this._buttons = ensureAllElements<HTMLButtonElement>('.button_alt', this.container);
 
     this._buttons.forEach(button => {
-      button.addEventListener('click', () => {
-        alert(`Выбрали оплату ${button.name}`);
-      })
+      paymentType
+      button.addEventListener('click', actions.onClick);
     })
   }
 
-
-
-  
-  set payment(name: string) {
-
-
+  // Изменение стиля кнопки выбора оплаты
+  set payment(paymentName: string) {
+    // определяем тип оплаты на основании его названия
+    const payment = Object.keys(paymentType).find(key => paymentType[key] === paymentName);
+    // перебираем кнопки в массиве и в зависимости от name вешаем или снимаем класс
+    this._buttons.forEach(button => {
+      if(button.name === payment) {
+        button.classList.add('button_alt-active');
+      } else {
+        button.classList.remove('button_alt-active');
+      }
+    })
   }
 
   set address(value: string) {

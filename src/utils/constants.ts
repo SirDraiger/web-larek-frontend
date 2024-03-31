@@ -4,3 +4,8 @@ export const CDN_URL = `${process.env.API_ORIGIN}/content/weblarek`;
 export const settings = {
 
 };
+
+export const paymentType: {[key: string]: string} = {
+  card: 'online',
+  cash: 'cash'
+}

@@ -1,13 +1,13 @@
 import './scss/styles.scss';
 import { WebLarekAPI } from './components/WebLarekAPI'
-import {API_URL, CDN_URL} from "./utils/constants";
+import {API_URL, CDN_URL, paymentType} from "./utils/constants";
 import { AppState, CatalogChangeEvent } from './components/AppData';
 import { EventEmitter } from './components/base/events';
 import { Page } from './components/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Card } from './components/Card';
 import { Modal } from './components/common/Modal';
-import { IProduct } from './types';
+import { IContactForm, IOrderForm, IProduct } from './types';
 import { Basket } from './components/common/Basket';
 import { Contacts, Order } from './components/Order';
 import { Success } from './components/common/Success';
@@ -39,7 +39,9 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
 // Переиспользуемые части интерфейса
 const basket = new Basket(cloneTemplate(basketTemplate), events);
-const order = new Order(cloneTemplate(orderTemplate), events);
+const order = new Order(cloneTemplate(orderTemplate), events, {
+	onClick: (evt: Event) => events.emit('orderPayment:change', evt.target),
+});
 const contacts = new Contacts(cloneTemplate(contactTemplate), events);
 
 // Изменились элементы каталога
@@ -112,9 +114,6 @@ api
 		console.error(err);
 	});
 
-
-
-
 // Открытие корзины
 events.on('basket:open', () => {
 
@@ -148,10 +147,7 @@ events.on('basket:remove', () => {
 
 		const card = new Card(cloneTemplate(cardBasketTemplate), {
 			onClick: () => {
-				console.log(AppData.basket);
 				AppData.removeFromBasket(item);
-				console.log(AppData.basket);
-				console.log(AppData.catalog);
 				events.emit('basket:remove');
 			}
 		});
@@ -171,33 +167,70 @@ events.on('basket:remove', () => {
 });
 
 // Открытие формы выбора оплаты и ввода адреса
-events.on('order: open', () => {
+events.on('order:open', () => {
+	order.payment = AppData.order.payment;
 	modal.render({
 		content: order.render({
-			address: '',
-			valid: true,
+			address: AppData.order.address,
+			payment: AppData.order.payment,
+			valid: AppData.validateOrder(),
 			errors: []
 		})
 	});
+	// Добавляем в заказ id товаров из корзины
+	AppData.order.items = AppData.basket.map(item => item.id);
+});
+
+// Изменился тип оплаты заказа
+events.on('orderPayment:change', (button: HTMLButtonElement) => {
+	
+	AppData.order.payment = paymentType[button.getAttribute('name')];
+	order.payment = AppData.order.payment;
+
+});
+
+// Изменилось поле формы заказа
+events.on(/^order\..*:change/, (data: {field: keyof IOrderForm, value: string}) => {
+	AppData.setOrderField(data.field, data.value);
+});
+
+// Изменилось состояние валидации формы заказа
+events.on('formErrorsOrder:change', (errors: Partial<IOrderForm>) => {
+	const {payment, address} = errors;
+	order.valid = !payment && !address;
+	order.errors = Object.values({payment, address}).filter((i) => !!i).join('; ');
 });
 
 // Открытие формы ввода контактов пользователя
 events.on('order:submit', () => {
 	modal.render({
 		content: contacts.render({
-			email: '',
-			phone: '',
-			valid: true,
+			email: AppData.order.email,
+			phone: AppData.order.phone,
+			valid: AppData.validateContact(),
 			errors: []
 		})
 	});
+});
+
+// Изменилось поле формы заказа
+events.on(/^contacts\..*:change/, (data: {field: keyof IContactForm, value: string}) => {
+	AppData.setContactField(data.field, data.value);
+});
+
+// Изменилось состояние валидации формы контактов
+events.on('formErrorsContact:change', (errors: Partial<IContactForm>) => {
+	const {email, phone} = errors;
+	contacts.valid = !email && !phone;
+	contacts.errors = Object.values({email, phone}).filter((i) => !!i).join('; ');
 });
 
 // Успешная оплата заказа 
 events.on('contacts:submit', () => {
 	const success = new Success(cloneTemplate(successTemplate), {
 		onClick: () => {
-			modal.close();
+			console.log(AppData.order);
+			// modal.close();
 		},
 	});
 
