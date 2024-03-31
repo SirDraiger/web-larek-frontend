@@ -9,6 +9,8 @@ import { Card } from './components/Card';
 import { Modal } from './components/common/Modal';
 import { IProduct } from './types';
 import { Basket } from './components/common/Basket';
+import { Contacts, Order } from './components/Order';
+import { Success } from './components/common/Success';
 
 const events = new EventEmitter();
 const api = new WebLarekAPI(CDN_URL, API_URL);
@@ -23,7 +25,10 @@ const cardCatalogTemplate = ensureElement<HTMLTemplateElement>("#card-catalog");
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
 const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
 const cardBasketTemplate = ensureElement<HTMLTemplateElement>("#card-basket");
-// 
+const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
+const contactTemplate = ensureElement<HTMLTemplateElement>('#contacts');
+const successTemplate = ensureElement<HTMLTemplateElement>('#success');
+
 
 // Модель данных приложения
 const AppData = new AppState({}, events);
@@ -34,6 +39,8 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
 // Переиспользуемые части интерфейса
 const basket = new Basket(cloneTemplate(basketTemplate), events);
+const order = new Order(cloneTemplate(orderTemplate), events);
+const contacts = new Contacts(cloneTemplate(contactTemplate), events);
 
 // Изменились элементы каталога
 events.on<CatalogChangeEvent>('items:changed', () => {
@@ -148,6 +155,7 @@ events.on('basket:remove', () => {
 				events.emit('basket:remove');
 			}
 		});
+
 			return card.render({
 				title: item.title,
 				price: item.price,
@@ -155,10 +163,47 @@ events.on('basket:remove', () => {
 			});
 	})
 
-
 	return modal.render({
 		content: basket.render({
 			total: AppData.getTotal()
+		})
+	});
+});
+
+// Открытие формы выбора оплаты и ввода адреса
+events.on('order: open', () => {
+	modal.render({
+		content: order.render({
+			address: '',
+			valid: true,
+			errors: []
+		})
+	});
+});
+
+// Открытие формы ввода контактов пользователя
+events.on('order:submit', () => {
+	modal.render({
+		content: contacts.render({
+			email: '',
+			phone: '',
+			valid: true,
+			errors: []
+		})
+	});
+});
+
+// Успешная оплата заказа 
+events.on('contacts:submit', () => {
+	const success = new Success(cloneTemplate(successTemplate), {
+		onClick: () => {
+			modal.close();
+		},
+	});
+
+	modal.render({
+		content: success.render({
+			total: AppData.getTotal(),
 		})
 	});
 });

@@ -24,7 +24,6 @@ export class Basket extends Component<IBasketView> {
 
     this._button.addEventListener('click', () => {
       events.emit("order: open");
-      alert("Открыли модалку с выбором оплаты");
     })
   }
 
