@@ -6,7 +6,7 @@ export class AppState extends Model<IAppState> {
   catalog: IProduct[];
   basket: IProduct[] = [];
   order: IOrder = {
-    payment: '',
+    payment: 'online',
     email: '',
     phone: '',
     address: '',

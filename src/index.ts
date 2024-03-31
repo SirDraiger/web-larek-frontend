@@ -177,6 +177,7 @@ events.on('order:open', () => {
 			errors: []
 		})
 	});
+	AppData.order.total = AppData.getTotal();
 	// Добавляем в заказ id товаров из корзины
 	AppData.order.items = AppData.basket.map(item => item.id);
 });
