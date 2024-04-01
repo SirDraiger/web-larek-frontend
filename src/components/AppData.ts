@@ -5,6 +5,7 @@ import {
 	IOrder,
 	IOrderForm,
 	IProduct,
+	IProductData,
 } from '../types/index';
 import { Model } from './base/Model';
 
@@ -24,7 +25,7 @@ export class AppState extends Model<IAppState> {
 	formErrors: IFormErrors = {};
 
 	// Создание карточек с товаров
-	setCatalog(items: IProduct[]) {
+	setCatalog(items: IProductData[]) {
 		this.catalog = items.map((item) => new CardItem(item, this.events));
 		this.emitChanges('items:changed', { catalog: this.catalog });
 	}
