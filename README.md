@@ -49,7 +49,7 @@ yarn build
 * post - отправляет post запрос
 
 ### Класс Model<T>
-Абстрактный базовый класс. На основе данного класса реализуются классы модели - AppState, CardItem. <br>
+Абстрактный базовый класс. На основе данного класса реализуется класс модели - AppState. <br>
 Содержит следующие методы:
 * emitChanges - сообщает всем, что модель изменилась
 
@@ -94,7 +94,7 @@ order: IOrder = { // хранит данные о заказе
 	formErrors: IFormErrors = {}; // хранение ошибок валидации
 ```
 Содержит следующие методы:
-* setCatalog() - создаёт массив карточек товаров (экземпляры класса CardItem)
+* setCatalog() - создаёт массив карточек товаров
 * addToBasket() - добавляет товар в корзину
 * removeFromBasket() - удаляет товар из корзины
 * clearBasket() - очищает корзину
@@ -261,7 +261,7 @@ export interface IProductData {
 
 // Интерфейс данных о товаре
 export interface IProduct extends IProductData {
-  inBasket?: boolean;
+  inBasket: boolean;
 }
 
 // Интерфейс модели данных приложения
