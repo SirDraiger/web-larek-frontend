@@ -222,3 +222,87 @@ interface IPage {
 * Сеттер catalog - выводит на страницу каталог товаров
 * Сеттер locked - блокировка прокрутки страницы
 * Сеттер counter - обновляет счётчик товаров в корзине
+
+## Контроллер
+Код написанный в файле index.ts отвечает за взаимодесвие со слоем модели и передачи данных из него в слой view. <br>
+Основные события:
+* items:changed - изменение каталога товаров
+* basket:changed - изменение содержимого корзины
+* card:select - нажатие на карточку товара
+* card:open - открытие карточки товара
+* modal:open - открытие модального окна
+* modal:close - закрытие модального окна
+* basket:open - открытие корзины
+* basket:remove - удаление товара из корзины
+* order:open - открытие формы заказа
+* orderPayment:change - изменение типа оплаты
+* /^order\..*:change/ - изменение полей в форме заказа
+* formErrorsOrder:change - изменение состояния валидации формы заказа
+* order:submit - открытие формы контактов
+* /^contacts\..*:change/ - изменение полей в форме контактов
+* formErrorsContact:change - изменение состояния валидации формы контактов
+* contacts:submit - успешная оплата заказа
+
+## Взаимодействие с сервером
+### Класс WebLarekAPI
+Класс для взаимодействие с серверов. Наследуется от базового класса Api.
+```
+interface IWebLarekAPI {
+  getCardList: () => Promise<IProductData[]>;
+  getCardItem: (id: string) => Promise<IProductData>;
+  sendOrder: (order: IOrder) => Promise<IOrder>;
+}
+```
+Имеет следующие методы:
+* getCardList - get запрос, получение списка товаров
+* getCardItem - get запрос, получение товара по его id
+* sendOrder - post запрос, отправка данных по заказу
+
+## Ключевые типы данных
+```
+// Интерфейс данных продукта (Ответ от сервера)
+export interface IProductData {
+  id: string;
+  description: string;
+  image: string;
+  title: string;
+  category: string;
+  price: number | null;  
+}
+
+// Интерфейс данных о товаре
+export interface IProduct extends IProductData {
+  inBasket: boolean;
+}
+
+// Интерфейс модели данных приложения
+export interface IAppState {
+  catalog: IProduct[];
+  basket: IProduct[];
+}
+
+// Интренфейс формы выбора оплаты и доставки
+export interface IOrderForm {
+  payment: string;
+  address: string;
+}
+
+// Интерфейс формы ввода контактных данных
+export interface IContactForm {
+  email: string;
+  phone: string;
+}
+
+// Интерфейс товара в заказе 
+interface IItemOrder {
+  items: string[];
+}
+
+// Интерфейс заказа
+export interface IOrder extends IOrderForm, IContactForm, IItemOrder {
+  total: number;
+}
+
+// Общий тип для валидации форм заказа
+export type IFormErrors = Partial<Record<keyof IOrder, string>>;
+```
