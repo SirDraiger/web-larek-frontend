@@ -106,18 +106,6 @@ order: IOrder = { // хранит данные о заказе
 * setContactField() - заполняет данные формы в заказ (почта, телефон)
 * validateContact() - проверяет данные почты и телефона
 
-### Класс CardItem
-Класс данных отдельной карточки. Хранит в себе информацию по товару. Наследуется от базового класса Model. <br>
-Содердит следующие свойства:
-```
-id: string; // идентификатор товара
-description: string; // описание товара
-image: string; // ссылка на картинку товара
-title: string; // название товара
-category: string; // категория товара
-price: number | null; // цена товара
-inBasket: boolean = false; // признак наличия товара в корзине
-```
 
 ## Компоненты представления
 ### Класс Basket
@@ -273,7 +261,7 @@ export interface IProductData {
 
 // Интерфейс данных о товаре
 export interface IProduct extends IProductData {
-  inBasket: boolean;
+  inBasket?: boolean;
 }
 
 // Интерфейс модели данных приложения

@@ -10,7 +10,7 @@ export interface IProductData {
 
 // Интерфейс данных о товаре
 export interface IProduct extends IProductData {
-  inBasket: boolean;
+  inBasket?: boolean;
 }
 
 // Интерфейс модели данных приложения

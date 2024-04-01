@@ -24,9 +24,8 @@ export class AppState extends Model<IAppState> {
 
 	formErrors: IFormErrors = {};
 
-	// Создание карточек с товаров
 	setCatalog(items: IProductData[]) {
-		this.catalog = items.map((item) => new CardItem(item, this.events));
+		this.catalog = items;
 		this.emitChanges('items:changed', { catalog: this.catalog });
 	}
 
@@ -136,16 +135,5 @@ export class AppState extends Model<IAppState> {
 }
 
 export type CatalogChangeEvent = {
-	catalog: CardItem[];
+	catalog: IProduct[];
 };
-
-// Класс для хранения данных карточки
-class CardItem extends Model<IProduct> {
-	id: string;
-	description: string;
-	image: string;
-	title: string;
-	category: string;
-	price: number | null;
-	inBasket: boolean = false;
-}
