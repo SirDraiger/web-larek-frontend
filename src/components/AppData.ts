@@ -1,121 +1,150 @@
-import { IAppState, IContactForm, IFormErrors, IItemOrder, IOrder, IOrderForm, IProduct} from "../types/index"
-import { Model } from "./base/Model";
+import {
+	IAppState,
+	IContactForm,
+	IFormErrors,
+	IOrder,
+	IOrderForm,
+	IProduct,
+} from '../types/index';
+import { Model } from './base/Model';
 
 // Класс для хранения данных приложений
 export class AppState extends Model<IAppState> {
-  catalog: IProduct[];
-  basket: IProduct[] = [];
-  order: IOrder = {
-    payment: 'online',
-    email: '',
-    phone: '',
-    address: '',
-    total: 0,
-    items: []
-  }
+	catalog: IProduct[];
+	basket: IProduct[] = [];
+	order: IOrder = {
+		payment: 'online',
+		email: '',
+		phone: '',
+		address: '',
+		total: 0,
+		items: [],
+	};
 
-  formErrors: IFormErrors = {};
+	formErrors: IFormErrors = {};
 
-  setCatalog(items: IProduct[]) {
-    this.catalog = items.map(item => new CardItem(item, this.events));
-    this.emitChanges("items:changed", {catalog: this.catalog});
-  }
+	// Создание карточек с товаров
+	setCatalog(items: IProduct[]) {
+		this.catalog = items.map((item) => new CardItem(item, this.events));
+		this.emitChanges('items:changed', { catalog: this.catalog });
+	}
 
-  addToBasket(item: IProduct) {
-    if(!this.inBasket(item.id) && typeof(item.price) === 'number' && item.price > 0) {
-        this.basket.push(item);
-        item.inBasket = true;
-        this.emitChanges("basket:changed");
-      }
-    }
+	// Добавление товара в корзину
+	addToBasket(item: IProduct) {
+		if (
+			!this.inBasket(item.id) &&
+			typeof item.price === 'number' &&
+			item.price > 0
+		) {
+			this.basket.push(item);
+			item.inBasket = true;
+			this.emitChanges('basket:changed');
+		}
+	}
 
+	// Удаление товара из корзины
+	removeFromBasket(item: IProduct) {
+		item.inBasket = false;
+		const index = this.basket.indexOf(item);
+		this.basket.splice(index, 1);
+		this.emitChanges('basket:changed');
+	}
 
-    // Переделать это безобразие
-    removeFromBasket(item: IProduct) {
-      item.inBasket = false;
-      const index = this.basket.indexOf(item);
-      this.basket.splice(index, 1);
-      this.emitChanges("basket:changed");
-      // this.emitChanges("basket:remove");
-      }
+	// Очистка корзины
+	clearBasket() {
+		this.basket.forEach((item) => {
+			item.inBasket = false;
+			this.basket = [];
+			this.emitChanges('basket:changed');
+		});
+	}
 
-    inBasket(id: string) {
-      return !!this.basket.find(item => item.id === id);
-    }
+	// Очистка заказа (оставляем адрес и контакты на случай ещё одного заказа)
+	clearOrder() {
+		this.order.total = 0;
+		this.order.items = [];
+	}
 
-    getTotal() {
-      let sum: number = 0;
-      this.basket.forEach(item => {
-        sum = sum + item.price
-      })
-      return sum;
-    }
+	// Проверка на наличие товара в корзине
+	inBasket(id: string) {
+		return !!this.basket.find((item) => item.id === id);
+	}
 
-    // Запись адреса из формы
-    setOrderField(field: keyof IOrderForm, value: string) {
-      this.order[field] = value;
+	// Получение суммы заказа на основании данных в корзине
+	getTotal() {
+		let sum: number = 0;
+		this.basket.forEach((item) => {
+			sum = sum + item.price;
+		});
+		return sum;
+	}
 
-      if(this.validateOrder()) {
-        this.events.emit('order:ready', this.order);
-      }
-    }
+	// Запись данных из формы заказа
+	setOrderField(field: keyof IOrderForm, value: string) {
+		this.order[field] = value;
 
-    // Валидация заказа (выбор оплаты и ввод адреса)
-    validateOrder() {
-      const errors: typeof this.formErrors = {};
+		if (this.validateOrder()) {
+			this.events.emit('order:ready', this.order);
+		}
+	}
 
-      if(!this.order.payment) {
-        errors.payment = 'Необходимо выбрать способ оплаты';
-      }
+	// Валидация заказа (выбор оплаты и ввод адреса)
+	validateOrder() {
+		const errors: typeof this.formErrors = {};
 
-      if(!this.order.address) {
-        errors.address = 'Необходимо указать адрес доставки';
-      }
+		if (!this.order.payment) {
+			errors.payment = 'Необходимо выбрать способ оплаты';
+		}
 
-      this.formErrors = errors;
-      this.events.emit('formErrorsOrder:change', this.formErrors);
+		if (!this.order.address) {
+			errors.address = 'Необходимо указать адрес доставки';
+		}
 
-      return Object.keys(errors).length === 0;
-    }
+		this.formErrors = errors;
+		this.events.emit('formErrorsOrder:change', this.formErrors);
 
-    setContactField(field: keyof IContactForm, value: string) {
-      this.order[field] = value;
+		return Object.keys(errors).length === 0;
+	}
 
-      if(this.validateContact()) {
-        this.events.emit('contact:ready');
-      }
-    }
+	// Запись данных формы контактов
+	setContactField(field: keyof IContactForm, value: string) {
+		this.order[field] = value;
 
-    // Валидация контактов (форма ввода почты и телефона)
-    validateContact() {
-      const errors: typeof this.formErrors = {};
+		if (this.validateContact()) {
+			this.events.emit('contact:ready');
+		}
+	}
 
-      if(!this.order.email) {
-        errors.email = 'Необходимо указать почту';
-      }
+	// Валидация контактов (форма ввода почты и телефона)
+	validateContact() {
+		const errors: typeof this.formErrors = {};
 
-      if(!this.order.phone) {
-        errors.phone = 'Необходимо указать телефон';
-      }
+		if (!this.order.email) {
+			errors.email = 'Необходимо указать почту';
+		}
 
-      this.formErrors = errors;
-      this.events.emit('formErrorsContact:change', this.formErrors);
+		if (!this.order.phone) {
+			errors.phone = 'Необходимо указать телефон';
+		}
 
-      return Object.keys(errors).length === 0;
-    }
-  }
+		this.formErrors = errors;
+		this.events.emit('formErrorsContact:change', this.formErrors);
+
+		return Object.keys(errors).length === 0;
+	}
+}
 
 export type CatalogChangeEvent = {
-  catalog: CardItem[];
-}
+	catalog: CardItem[];
+};
 
 // Класс для хранения данных карточки
 class CardItem extends Model<IProduct> {
-  id: string;
-  description: string;
-  image: string;
-  title: string;
-  category: string;
-  price: number | null;
-  inBasket: boolean = false;
+	id: string;
+	description: string;
+	image: string;
+	title: string;
+	category: string;
+	price: number | null;
+	inBasket: boolean = false;
 }
